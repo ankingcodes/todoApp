@@ -48,6 +48,17 @@ router.get('/todos/:todoId', async (req, res, next) => {
   }
 })
 
+// get one todo by searching by todoName
+router.get('/todo/:todoName', async (req, res, next) => {
+  try{
+    console.log(req.params.todoName)
+    const todo = await db.find({"task":req.params.todoName}).exec()
+    res.status(200).json(todo)
+  } catch(e) {
+    res.status(400).send("Error fetching todo. " + e)
+  }
+})
+
 // delete a todo with an id
 router.delete('/todos/:todoId', async (req, res, next) => {
   try{
@@ -57,6 +68,18 @@ router.delete('/todos/:todoId', async (req, res, next) => {
     res.status(200).send(todos)
   } catch(e) {
     res.status(400).send("Error! Cannot delete todo")
+  }
+})
+
+//delete a todo by todo name
+router.delete('/todo/:todoName', async (req, res) => {
+  try{
+    const todos = await db.findOneAndDelete({
+      task: req.params.todoName
+    }).exec()
+    res.status(200).send(todos)
+  } catch(e){
+    res.status(400).send("Error ! Cannot delete todo by name")
   }
 })
 
@@ -72,4 +95,16 @@ router.patch('/todos/:todoId', async (req, res, next) => {
   }
 })
 
+// update hasCompleted to opposite of current value
+router.patch('/todo/:todoName', async (req,res) => {
+  try{
+    console.log(req.body)
+    const todos = await db.findOneAndUpdate({
+      task: req.params.todoName
+    }, req.body)
+    res.status(200).send(todos)
+  } catch(e) {
+    res.status(400).send("Error! Cannot toggle hasCompleted !")
+  }
+})
 module.exports = router
