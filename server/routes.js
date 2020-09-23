@@ -7,27 +7,14 @@ const mongoose = require('mongoose')
 router.get('/todos', (req, res, next) => {
   db.find().select('_id task hasCompleted').exec()
   .then(todo => {
-    const response = {
-      count: todo.length,
-      todo: todo.map(todo => {
-        return {
-          _id: todo._id,
-          task: todo.task,
-          hasCompleted: !todo.hasCompleted,
-          request: {
-            type: 'GET',
-            url: 'http://localhost:3000/api/todo/' + todo._id
-          }
-        }
-      })
-    }
-    res.status(200).send(response);
+    res.status(200).send(todo);
   })
   .catch(err => res.status(500).json({ error: err }))
 })
 
 // post one todo "promise style"
 router.post('/todos', async (req, res, next) => {
+  console.log(req.body.hasCompleted)
   const todo = await new db({
     _id: new mongoose.Types.ObjectId(),
     task: req.body.task,

@@ -5,41 +5,34 @@ import TodoList from './TodoList';
 import TodoForm from './TodoForm';
 
 function App() {
-  const [todo, setTodo] = useState({
-    todos: [],
-    totalTodos: 0
-  })
+  const [todos, setTodo] = useState([])
 
   useEffect(() => {
-    const url = "/api/todos"
-    fetch(url)
-    .then(res => res.json())
-    .then(data => {
-      let todos = []
-      let count = 0
-      data.todo.map(r => {
-        todos.push({
-          task: r.task,
-          hasCompleted: r.hasCompleted
-        })
-        count = count + 1
-      })
-      setTodo({
-        todos: todos,
-        totalTodos: count
-      })
+    fetch('/api/todos')
+    .then(res => {
+      console.log("Successfully fetched todos !!!" + res)
+      return res.json()
     })
-    .catch((e) => console.log("Unable to fetch", e))
-  })
+    .then(r => {
+      console.log(r)
+      setTodo(todos => todos.concat(r))
+    })
+    .catch(e => console.log(e))
+  },[])
+
+  const updateState = () => {
+    todos.length = 0
+    fetch('/api/todos')
+    .then(res => res.json())
+    .then(r => setTodo(todos => todos.concat(r)))
+    .catch(e => console.log(e))
+  }
 
   return (
     <div className="App">
       <h2>TODO LIST</h2>
-      <TodoForm />
-      <TodoList
-      todos={todo.todos}
-      count={todo.totalTodos}
-      />
+      <TodoForm update={updateState.bind(this)}/>
+      <TodoList todos={todos} update={updateState.bind(this)}/>
     </div>
   );
 }

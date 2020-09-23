@@ -3,18 +3,23 @@ import React, { useState, useEffect } from 'react';
 const TodoForm = (props) => {
   const handleClick = () => {
     const task = document.getElementById('task').value
-    console.log(task)
     const reqOpts = {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
         task: String(task),
-        hasCompleted: "false"
+        hasCompleted: Boolean(false)
       })
     }
 
     fetch('/api/todos', reqOpts)
-    .then(r => console.log("Successful POST req" + r))
+    .then(r => {
+      console.log(r)
+      console.log("Successful POST req" + r.body)
+      const task = document.getElementById('task')
+      task.value = ""
+      props.update()
+    })
     .catch(e => console.log(e))
   }
 
