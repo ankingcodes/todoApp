@@ -1,22 +1,27 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios'
 import logo from './logo.svg';
 import './App.css';
 
 function App() {
-  const [todo, setTodo] = useState('')
+  const [todo, setTodo] = useState({})
 
   useEffect(() => {
-    console.log("before fetch")
-    console.log(fetch('http://localhost:9999/api/allTodos', {
-      method: 'GET'
-    }))
-    console.log("After fetch")
+    const url = "http://localhost:9999/api/todos"
+    fetch(url)
+    .then(res => res.json())
+    .then(data => console.log(data))
+    .catch((e) => console.log("Unable to fetch", e))
+    axios.get(url)
+    .then(res => res.json())
+    .then(data => console.log(data))
+    .catch((e) => console.log("Unable to fetch", e))
   })
 
   return (
     <div className="App">
         <p>
-          {todo}
+          TODO
         </p>
     </div>
   );

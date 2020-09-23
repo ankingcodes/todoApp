@@ -3,9 +3,8 @@ const router = express.Router()
 const db = require('./db')
 const mongoose = require('mongoose')
 
-// get all todos
+// get all todos "custom response"
 router.get('/todos', (req, res, next) => {
-  console.log(req.body)
   db.find().select('_id task hasCompleted').exec()
   .then(todo => {
     const response = {
@@ -27,7 +26,7 @@ router.get('/todos', (req, res, next) => {
   .catch(err => res.status(500).json({ error: err }))
 })
 
-// post one todo
+// post one todo "promise style"
 router.post('/todos', async (req, res, next) => {
   const todo = await new db({
     _id: new mongoose.Types.ObjectId(),
@@ -39,9 +38,38 @@ router.post('/todos', async (req, res, next) => {
   }).catch((e) => e.message)
 })
 
-// get one todo
-router.get('/todos/:todoId', (req, res, next) => {
+// get one todo "async await style"
+router.get('/todos/:todoId', async (req, res, next) => {
+  try{
+    const todos = await db.findById(req.params.todoId).exec()
+    res.status(200).json(todos)
+  } catch(e) {
+    res.status(400).send("Error fetching todos.")
+  }
+})
 
+// delete a todo with an id
+router.delete('/todos/:todoId', async (req, res, next) => {
+  try{
+    const todos = await db.deleteOne({
+      _id: req.params.todoId
+    })
+    res.status(200).send(todos)
+  } catch(e) {
+    res.status(400).send("Error! Cannot delete todo")
+  }
+})
+
+// update / replace task of a todo
+router.patch('/todos/:todoId', async (req, res, next) => {
+  try{
+    const todos = await db.findByIdAndUpdate({
+      _id: req.params.todoId
+    }, req.body)
+    res.status(200).send(todos)
+  } catch(e) {
+    res.status(400).send("Error! Cannot update todo")
+  }
 })
 
 module.exports = router
